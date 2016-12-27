@@ -1,0 +1,163 @@
+/*******************************************************************************
+   ERS Database - Version 1.4
+   Script: 
+   DB Server: Oracle
+   Author: Bryan Cantos
+********************************************************************************/
+-- DDL -> Data Definition Language
+-- DML -> Data Manipulation Language (create, read, update, delete)
+/*******************************************************************************
+   Drop database if it exists
+********************************************************************************/
+DROP USER ERS CASCADE;
+
+
+/*******************************************************************************
+   Create database
+********************************************************************************/
+Create user ERS
+identified by password;
+
+grant dba to ERS;
+conn ERS/password
+
+
+/*******************************************************************************
+   Create Tables
+********************************************************************************/
+
+CREATE TABLE ERS_REIMBURSEMENT
+(
+  REIMB_ID          NUMBER NOT NULL     ,
+  REIMB_AMOUNT      NUMBER NOT NULL     ,
+  REIMB_SUMBITTED   TIMESTAMP NOT NULL  ,
+  REIMB_RESOLVED    TIMESTAMP           ,
+  REIMB_DESCRIPTION VARCHAR2(250)       ,
+  REIMB_RECEIPT     BLOB                ,
+  REIMB_AUTHOR      NUMBER NOT NULL     ,
+  REIMB_RESOLVER    NUMBER              ,
+  REIMB_STATUS_ID   NUMBER NOT NULL     ,
+  REIMB_TYPE_ID     NUMBER NOT NULL     ,
+  CONSTRAINT ERS_REIMBURSEMENT_PK PRIMARY KEY  (REIMB_ID)
+);
+
+CREATE TABLE ERS_USERS
+(
+  ERS_USERS_ID    NUMBER NOT NULL               ,
+  ERS_USERNAME    VARCHAR2(50) NOT NULL         ,
+  ERS_PASSWORD    VARCHAR2(60) NOT NULL         ,
+  USER_FIRSTNAME  VARCHAR2(100) NOT NULL        ,
+  USER_LASTNAME   VARCHAR2(100) NOT NULL        ,
+  USER_EMAIL      VARCHAR2(150) NOT NULL        ,
+  USER_ROLE_ID    NUMBER NOT NULL               ,
+  CONSTRAINT ERS_USER_PK PRIMARY KEY (ERS_USERS_ID)  ,
+  CONSTRAINT ERS_USER_UNv1 UNIQUE (ERS_USERNAME, USER_EMAIL)
+);
+
+CREATE TABLE ERS_REIMBURSEMENT_STATUS
+(
+  REIMB_STATUS_ID NUMBER NOT NULL       ,
+  REIMB_STATUS    VARCHAR2(10) NOT NULL ,
+  CONSTRAINT REIMB_STATUS_PK PRIMARY KEY (REIMB_STATUS_ID)
+);
+
+CREATE TABLE ERS_REIMBURSEMENT_TYPE
+(
+  REIMB_TYPE_ID NUMBER NOT NULL       ,
+  REIMB_TYPE    VARCHAR2(10) NOT NULL ,
+  CONSTRAINT REIMB_TYPE_PK PRIMARY KEY  (REIMB_TYPE_ID)
+);
+
+CREATE TABLE ERS_USER_ROLES
+(
+  ERS_USER_ROLE_ID  NUMBER NOT NULL        ,
+  USER_ROLE         VARCHAR2(10) NOT NULL  ,
+  CONSTRAINT ERS_USER_ROLE_PK PRIMARY KEY  (ERS_USER_ROLE_ID)
+);
+
+/*******************************************************************************
+   Create Foreign Keys
+********************************************************************************/
+ALTER TABLE ERS_REIMBURSEMENT ADD CONSTRAINT ERS_USERS_FK_AUTH
+    FOREIGN KEY (REIMB_AUTHOR) REFERENCES ERS_USERS(ERS_USERS_ID);
+    
+ALTER TABLE ERS_REIMBURSEMENT ADD CONSTRAINT ERS_USERS_FK_RESLVR
+    FOREIGN KEY (REIMB_RESOLVER) REFERENCES ERS_USERS(ERS_USERS_ID);
+    
+ALTER TABLE ERS_REIMBURSEMENT ADD CONSTRAINT ERS_REIMBURSEMENT_STATUS_FK
+    FOREIGN KEY (REIMB_STATUS_ID) REFERENCES ERS_REIMBURSEMENT_STATUS(REIMB_STATUS_ID);
+    
+ALTER TABLE ERS_REIMBURSEMENT ADD CONSTRAINT ERS_RESIMBURSEMENT_TYPE_FK
+    FOREIGN KEY(REIMB_TYPE_ID) REFERENCES  ERS_REIMBURSEMENT_TYPE (REIMB_TYPE_ID);
+    
+ALTER TABLE ERS_USERS ADD CONSTRAINT  USER_ROLES_FK
+    FOREIGN KEY (USER_ROLE_ID) REFERENCES ERS_USER_ROLES(ERS_USER_ROLE_ID);
+    
+-- Insert into User Roles
+INSERT INTO ERS_USER_ROLES
+  VALUES(1, 'ADMIN');
+INSERT INTO ERS_USER_ROLES
+  VALUES(2, 'EMPLOYEES');
+
+-- Insert into Imbursement type
+INSERT INTO ERS_REIMBURSEMENT_TYPE
+  VALUES(1, 'LODGING');
+INSERT INTO ERS_REIMBURSEMENT_TYPE
+  VALUES(2, 'TRAVEL');
+INSERT INTO ERS_REIMBURSEMENT_TYPE
+  VALUES(3, 'FOOD');
+INSERT INTO ERS_REIMBURSEMENT_TYPE
+  VALUES(4, 'OTHER');
+  
+-- Insert into Imbursement Status
+INSERT INTO ERS_REIMBURSEMENT_STATUS
+VALUES(1, 'PENDING');
+INSERT INTO ERS_REIMBURSEMENT_STATUS
+VALUES(2, 'APPROVED');
+INSERT INTO ERS_REIMBURSEMENT_STATUS
+VALUES(3, 'DENIED');
+
+drop table ERS_users;
+-- Insert into User table
+INSERT INTO ERS_USERS (ERS_USERS_ID, ERS_USERNAME, ERS_PASSWORD , USER_FIRSTNAME, USER_LASTNAME, USER_EMAIL, USER_ROLE_ID) 
+  VALUES (1, 'admin', 'admin', 'Bryan', 'Cantos', 'Bryan.Cantos@email.com', 1);
+INSERT INTO ERS_USERS (ERS_USERS_ID, ERS_USERNAME, ERS_PASSWORD , USER_FIRSTNAME, USER_LASTNAME, USER_EMAIL, USER_ROLE_ID) 
+  VALUES (2, 'mmills1', 'kYk8YDH3sz9B', 'Michelle', 'Mills', 'mmills1@google.nl', 2);
+INSERT INTO ERS_USERS (ERS_USERS_ID, ERS_USERNAME, ERS_PASSWORD , USER_FIRSTNAME, USER_LASTNAME, USER_EMAIL, USER_ROLE_ID) 
+  VALUES (3, 'lbarnes2', 'ao8aOlecQe', 'Linda', 'Barnes', 'lbarnes2@wikipedia.org', 2);
+INSERT INTO ERS_USERS (ERS_USERS_ID, ERS_USERNAME, ERS_PASSWORD , USER_FIRSTNAME, USER_LASTNAME, USER_EMAIL, USER_ROLE_ID) 
+  VALUES (4, 'jhernandez3', 'rpBzWs7pHu', 'Justin', 'Hernandez', 'jhernandez3@prnewswire.com', 2);
+INSERT INTO ERS_USERS (ERS_USERS_ID, ERS_USERNAME, ERS_PASSWORD , USER_FIRSTNAME, USER_LASTNAME, USER_EMAIL, USER_ROLE_ID) 
+  VALUES (5, 'lcarpenter4', '6vs140SIsroN', 'Lisa', 'Carpenter', 'lcarpenter4@canalblog.com', 1);
+INSERT INTO ERS_USERS (ERS_USERS_ID, ERS_USERNAME, ERS_PASSWORD , USER_FIRSTNAME, USER_LASTNAME, USER_EMAIL, USER_ROLE_ID) 
+  VALUES (6, 'nhenderson5', '4uXVq9WTap', 'Nicole', 'Henderson', 'nhenderson5@jimdo.com', 2);
+INSERT INTO ERS_USERS (ERS_USERS_ID, ERS_USERNAME, ERS_PASSWORD , USER_FIRSTNAME, USER_LASTNAME, USER_EMAIL, USER_ROLE_ID) 
+  VALUES (7, 'ajordan6', 'AHFE9ri', 'Ashley', 'Jordan', 'ajordan6@mail.ru', 2);
+INSERT INTO ERS_USERS (ERS_USERS_ID, ERS_USERNAME, ERS_PASSWORD , USER_FIRSTNAME, USER_LASTNAME, USER_EMAIL, USER_ROLE_ID) 
+  VALUES (8, 'rharrison7', 'hCkIVK', 'Rachel', 'Harrison', 'rharrison7@blogs.com', 2);
+INSERT INTO ERS_USERS (ERS_USERS_ID, ERS_USERNAME, ERS_PASSWORD , USER_FIRSTNAME, USER_LASTNAME, USER_EMAIL, USER_ROLE_ID) 
+  VALUES (9, 'rperkins8', 'oaosFDbJD', 'Robin', 'Perkins', 'rperkins8@twitter.com', 2);
+INSERT INTO ERS_USERS (ERS_USERS_ID, ERS_USERNAME, ERS_PASSWORD , USER_FIRSTNAME, USER_LASTNAME, USER_EMAIL, USER_ROLE_ID) 
+  VALUES (10, 'rbryant9', 'insJBenHr', 'Robert', 'Bryant', 'rbryant9@pcworld.com', 2);
+INSERT INTO ERS_USERS (ERS_USERS_ID, ERS_USERNAME, ERS_PASSWORD , USER_FIRSTNAME, USER_LASTNAME, USER_EMAIL, USER_ROLE_ID) 
+  VALUES (11, 'bryan', 'bryan', 'Bryan', 'Cantos', 'bryan.cantos@email.com', 2);
+  
+CREATE SEQUENCE REIMB_SEQ 
+  START WITH 1
+  INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER ERS_REIMBURSEMENT_TRIGGER
+  BEFORE INSERT ON ERS_REIMBURSEMENT
+  FOR EACH ROW
+  DECLARE 
+    TEMP NUMBER;
+  BEGIN
+    SELECT REIMB_SEQ.NEXTVAL
+    INTO   TEMP
+    FROM   DUAL;
+    :NEW.REIMB_ID := TEMP;
+END;
+/
+commit;
+exit;
