@@ -1,22 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
-  <display-name>FrontEnd</display-name>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>FrontEnd</display-name>
 	<servlet>
 		<servlet-name>dispatch</servlet-name>
 		<servlet-class>com.ers.web.DispatcherServlet</servlet-class>
 	</servlet>
+	
 	<servlet-mapping>
 		<servlet-name>dispatch</servlet-name>
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
-	
+
 	<filter>
 		<filter-name>security</filter-name>
 		<filter-class>com.ers.security.SecurityFilter</filter-class>
 	</filter>
+	
 	<filter-mapping>
 		<filter-name>security</filter-name>
-		<url-pattern>index.jsp</url-pattern>
+		<url-pattern>/secure/*</url-pattern>
 	</filter-mapping>
 	
+	<servlet>
+		<servlet-name>error</servlet-name>
+		<servlet-class>com.ers.error.ErrorServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>error</servlet-name>
+		<url-pattern>/e</url-pattern>
+	</servlet-mapping>
+
+	<error-page>
+		<exception-type>java.lang.IllegalArgumentException</exception-type>
+		<location>/e</location>
+	</error-page>
+	
+	<error-page>
+		<error-code>403</error-code>
+		<location>/e</location>
+	</error-page>
+	
+	<error-page>
+		<error-code>404</error-code>
+		<location>/e</location>
+	</error-page>
+
 </web-app>

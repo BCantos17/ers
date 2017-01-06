@@ -18,7 +18,9 @@ public class ServiceLocator {
 	private static DataSource ers;
 	private static Properties env;
 	
-	// Load properties from application.properties in env
+	/*
+	 * Gets the properties and load them to env
+	 */
 	static{
 		InputStream stream = ServiceLocator.class.getClassLoader()
 							.getResourceAsStream("jndi.properties");
@@ -29,14 +31,19 @@ public class ServiceLocator {
 		}catch(IOException e) {}
 	}
 	
+	/*
+	 * Method to grab the DataSource
+	 */
 	public synchronized static DataSource getErsDatabase(){
 		if( ers == null )
 			ers = lookupErs();
 		
 		return ers;
 	}
-	
-	// Find the data source from the application.properties file
+
+	/*
+	 * Helper method to grab the Datasrouce from jndi property file
+	 */
 	private static DataSource lookupErs(){
 		try{
 			Context ctxt = new InitialContext();

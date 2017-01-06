@@ -11,21 +11,30 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ers.bean.User;
-
+/**
+ * Servlet for handling filters
+ * @author bcant
+ *
+ */
 public class SecurityFilter implements Filter {
 
+	/**
+	 * Filter method for sensitive data
+	 */
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 
 		HttpServletRequest httpReq = (HttpServletRequest) request;
-		User userSession = (User) ( httpReq.getSession().getAttribute( "userData" ) );
-		if( userSession != null && userSession.getRoleId() == 1 ){
+		
+		/*
+		 * If User has logged in, let them through
+		 */
+		if( httpReq.getSession().getAttribute("userData") != null ){
 			chain.doFilter(request, response);
 		} else{
 			HttpServletResponse httpResp = (HttpServletResponse) response;
-			httpResp.setStatus(403);
+			httpResp.sendError(403);
 		}
 	}
 

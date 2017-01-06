@@ -3,16 +3,35 @@ package com.ers.bean;
 import java.sql.Blob;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/*
+ * A Bean for Reimbursement request
+ * Contains Id, amount requested, date submitted,
+ * date resolved, a description, a receipt (unused in this project),
+ * user who submitted, user who resolved the request, the status and the user role.
+ * Every variable is a Json property 
+ */
 public class Reimbursement {
+	@JsonProperty
 	private int id;
+	@JsonProperty
 	private double amount;
+	@JsonProperty
 	private Date submitted;
+	@JsonProperty
 	private Date resolved;
+	@JsonProperty
 	private String descript;
+	@JsonProperty
 	private Blob reciept;
+	@JsonProperty
 	private User author;
+	@JsonProperty
 	private User resolver;
+	@JsonProperty
 	private int statusId;
+	@JsonProperty
 	private int typeId;
 	
 	public Reimbursement() {
@@ -24,7 +43,6 @@ public class Reimbursement {
 	 */
 	public Reimbursement(int id, double amount, Date submitted, Date resolved, String descript, Blob reciept,
 			User author, User resolver, int statusId, int typeId) {
-		super();
 		this.id = id;
 		this.amount = amount;
 		this.submitted = submitted;
@@ -51,6 +69,9 @@ public class Reimbursement {
 		this.typeId = typeId;
 	}
 	
+	/*
+	 * Getters and setters for all variables
+	 */
 	public int getId() {
 		return id;
 	}

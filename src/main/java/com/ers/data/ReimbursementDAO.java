@@ -10,6 +10,11 @@ import java.util.Date;
 import com.ers.bean.Reimbursement;
 import com.ers.bean.User;
 
+/**
+ * DAOs for insert, getAll, and updateStatus
+ * @author bcant
+ *
+ */
 class ReimbursementDAO {
 	private Connection conn;
 	 
@@ -22,14 +27,22 @@ class ReimbursementDAO {
 		this.conn = conn;
 	}
 	
+	/**
+	 * Executes insert query to Reimbursement table
+	 * @param reimb
+	 */
 	public void insert( Reimbursement reimb ){
 		Date date = new Date();
+		// SQL Query for insert
 		String sql = 	"insert into ERS_REIMBURSEMENT("
 							+ "REIMB_AMOUNT, REIMB_SUMBITTED, REIMB_DESCRIPTION, "
 							+ "REIMB_RECEIPT, REIMB_AUTHOR, REIMB_STATUS_ID, REIMB_TYPE_ID ) "
 						+"values( ?, ?, ?, ?, ?, ?, ?)";
 		PreparedStatement stmt = null;
 		
+		/*
+		 * Sets variables into SQL statement
+		 */
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setDouble		( 1, reimb.getAmount() 						);
@@ -43,23 +56,26 @@ class ReimbursementDAO {
 		} catch (SQLException e) { e.printStackTrace(); }
 	}
 	
+	/**
+	 * Executes select query for Reimbursement table and
+	 * left joins on User table for the Author and Resolver.
+	 * @return
+	 */
 	public ArrayList<Reimbursement> getAll(){
 		ArrayList<Reimbursement> reimbList = null;
 		
 		/*
-		 * Query to select the reimbursement rows and 
+		 * Query statement to select the reimbursement rows and 
 		 * uses left joins to get both the author's and resolvers's columns
 		 */
 		String sql = "select REIMB_ID, REIMB_AMOUNT, REIMB_SUMBITTED, REIMB_RESOLVED, REIMB_DESCRIPTION, "
 								+ "REIMB_RECEIPT, REIMB_AUTHOR, REIMB_RESOLVER, REIMB_STATUS_ID, REIMB_TYPE_ID, "
 				
-		/*Author's info*/	+ "AUTHOR.ERS_USERS_ID, AUTHOR.ERS_USERNAME, AUTHOR.ERS_PASSWORD , AUTHOR.USER_FIRSTNAME, "
-								+ "AUTHOR.USER_LASTNAME, AUTHOR.USER_EMAIL, AUTHOR.USER_ROLE_ID, "
+		/*Author's info*/	+ "AUTHOR.ERS_USERS_ID, AUTHOR.USER_FIRSTNAME, "
+								+ "AUTHOR.USER_LASTNAME, AUTHOR.USER_ROLE_ID, "
 		
-		/*Resolver's Info*/	+ "RESOLVER.ERS_USERS_ID as RESOLVER_ID, RESOLVER.ERS_USERNAME as RESOLVER_USERNAME, "
-								+ "RESOLVER.ERS_PASSWORD as RESOLVER_PASSWORD, RESOLVER.USER_FIRSTNAME as RESOLVER_FIRSTNAME, "
-								+ "RESOLVER.USER_LASTNAME as RESOLVER_LASTNAME, RESOLVER.USER_EMAIL as RESOLVER_EMAIL, "
-								+ "RESOLVER.USER_ROLE_ID as RESOLVER_ROLE_ID "
+		/*Resolver's Info*/	+ "RESOLVER.ERS_USERS_ID as RESOLVER_ID, RESOLVER.USER_FIRSTNAME as RESOLVER_FIRSTNAME, "
+								+ "RESOLVER.USER_LASTNAME as RESOLVER_LASTNAME, RESOLVER.USER_ROLE_ID as RESOLVER_ROLE_ID "
 								
 					+ "from ERS_REIMBURSEMENT "
 					+ "left outer join ERS_USERS AUTHOR "
@@ -70,6 +86,10 @@ class ReimbursementDAO {
 		
 		PreparedStatement stmt;
 
+		/*
+		 * Inserts Author's, Resolver's and Reimbursement information into
+		 * their respective objects
+		 */
 		try {
 			stmt = conn.prepareStatement(sql);
 			ResultSet rs = stmt.executeQuery();
@@ -78,20 +98,14 @@ class ReimbursementDAO {
 				
 				// Creates new User object and sets the author's information into the object
 				User author = new User( 	rs.getInt	("ERS_USERS_ID")	,
-											rs.getString("ERS_USERNAME")	,
-											rs.getString("ERS_PASSWORD")	,	
 											rs.getString("USER_FIRSTNAME")	,
 											rs.getString("USER_LASTNAME")	, 	
-											rs.getString("USER_EMAIL") 		,	
 											rs.getInt	("USER_ROLE_ID") 	);
 
 				// Creates new User object and sets the resolver's information into the object
 				User resolver = new User(	rs.getInt	("RESOLVER_ID")			,
-											rs.getString("RESOLVER_USERNAME")	,
-											rs.getString("RESOLVER_PASSWORD")	,	
 											rs.getString("RESOLVER_FIRSTNAME")	,
 											rs.getString("RESOLVER_LASTNAME")	, 	
-											rs.getString("RESOLVER_EMAIL") 		,	
 											rs.getInt	("RESOLVER_ROLE_ID")	);
 				
 				// Creates new Reimbursement object and set the column of the row into the object
@@ -115,8 +129,16 @@ class ReimbursementDAO {
 		return reimbList;
 	}
 	
+	/**
+	 * Execute update query on StatusId
+	 * @param statusId
+	 * @param reimbId
+	 * @param resolver
+	 */
 	public void updateStatus( int statusId, int reimbId, int resolver ){
 		Date date = new Date();
+		
+		// Query statement for updating the status
 		String sql = "update ERS_REIMBURSEMENT "
 					+ "set REIMB_RESOLVED = ?, "
 					+ "REIMB_RESOLVER = 	?, "
@@ -124,6 +146,9 @@ class ReimbursementDAO {
 					+ "where REIMB_ID = 	?";
 		PreparedStatement stmt;
 		
+		/*
+		 * Updates the Reimbursement table in the database
+		 */
 		try {
 			stmt = conn.prepareStatement( sql );	
 			stmt.setTimestamp	( 1, new java.sql.Timestamp( date.getTime() )	);

@@ -10,10 +10,16 @@ public class DAOTest {
 	public static void main(String[] args) {
 		
 		//testUserDAO();
-		testReimbDAO();
+		//testReimbDAO();
+		//encryptUserPass();
 		
 	}
 	
+/*	static void encryptUserPass() {
+		new DataFacade().encryptPassword();
+		
+	}*/
+
 	static void testUserDAO(){
 		DataFacade facade = new DataFacade();
 		User user1 = new User();
@@ -24,9 +30,9 @@ public class DAOTest {
 	
 	static void testReimbDAO(){
 		DataFacade facade = new DataFacade();
-		User user = facade.getByUsername	( "bryan" );
-		//Reimbursement reimb = new Reimbursement(120.00, new Date(), "Spent too much on food", null, user, 1, 1);
-		//facade.insert( reimb );
+		User user = facade.getByUsername	( "jhernandez3" );
+		Reimbursement reimb = new Reimbursement(1000.00, new Date(), "Travel money", null, user, 1, 2);
+		facade.insert( reimb );
 		ArrayList<Reimbursement> reimbList = new ArrayList<Reimbursement>();
 		reimbList = facade.getAll();
 		//facade.updateStatus(3, 22, 5);
